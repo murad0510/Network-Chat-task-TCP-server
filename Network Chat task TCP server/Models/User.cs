@@ -10,6 +10,6 @@ namespace Network_Chat_task_TCP_server.Models
     public class User
     {
         public string Name { get; set; }
-        public IPEndPoint EndPoint { get; set; }
+        public string EndPoint { get; set; }
     }
 }
