@@ -5,6 +5,7 @@ using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 
 namespace Network_Chat_task_TCP_server
 {
@@ -13,5 +14,6 @@ namespace Network_Chat_task_TCP_server
     /// </summary>
     public partial class App : Application
     {
+        public static WrapPanel MessageWrapPanel { get; set; }
     }
 }

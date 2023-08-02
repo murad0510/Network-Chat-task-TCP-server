@@ -1,0 +1,47 @@
+﻿<UserControl x:Class="Network_Chat_task_TCP_server.Views.ChatUC"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Network_Chat_task_TCP_server.Views"
+             mc:Ignorable="d" 
+             Width="540" Height="400" Background="White">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition Height="350"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock Background="#0DB187"></TextBlock>
+
+        <Canvas>
+            <Image Canvas.Top="10" Canvas.Right="140" Source="/Images/camera.png" Width="30" ></Image>
+            <Image Canvas.Top="10" Canvas.Right="80" Source="/Images/Telephone.png" Width="30" ></Image>
+            <Image Canvas.Top="10" Canvas.Right="20" Source="/Images/menu vertical.png" Width="30" ></Image>
+            <Image Canvas.Top="10" Canvas.Left="20" Source="/Images/back arrow.png" Width="30" ></Image>
+
+            <Label Content="{Binding UserName}" Margin="110,10,0,0"></Label>
+
+            <StackPanel Width="540" Height="300" Margin="0,50,0,0"></StackPanel>
+
+            <Ellipse Canvas.Bottom="16" Canvas.Left="63" Height="40" Width="40" Canvas.Top="5">
+                <Ellipse.Fill>
+                    <ImageBrush ImageSource="/Images/Human photo.png"/>
+                </Ellipse.Fill>
+            </Ellipse>
+
+            <TextBox Name="myTextBox" Foreground="Gray" Text="{Binding UserMessage}" Background="FloralWhite" Width="450" Height="50" Margin="0,350,0,0"  HorizontalContentAlignment="Left" VerticalContentAlignment="Center"></TextBox>
+
+            <Button Command="{Binding SendCommand}"  Background="#15CF9F" Width="70" Height="50" Margin="460,350,0,0">
+                <Button.Resources>
+                    <Style TargetType="Border">
+                        <Setter Property="CornerRadius" Value="40"/>
+                    </Style>
+                </Button.Resources>
+                <Image Canvas.Top="10" Canvas.Left="20" Source="/Images/send.png" Width="30" ></Image>
+            </Button>
+
+        </Canvas>
+
+    </Grid>
+</UserControl>

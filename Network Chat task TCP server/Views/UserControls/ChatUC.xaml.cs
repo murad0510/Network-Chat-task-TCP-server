@@ -1,10 +1,7 @@
 ﻿using Network_Chat_task_TCP_server.ViewModels;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Net;
-using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -17,21 +14,18 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace Network_Chat_task_TCP_server
+namespace Network_Chat_task_TCP_server.Views
 {
     /// <summary>
-    /// Interaction logic for MainWindow.xaml
+    /// Interaction logic for ChatUC.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class ChatUC : UserControl
     {
-
-
-        public MainWindow()
+        public ChatUC()
         {
             InitializeComponent();
-            App.MessageWrapPanel = MessageWrapPanel;
-            MainViewModel mainViewModel = new MainViewModel();
-            this.DataContext = mainViewModel;
+            ChatUcViewModel chatUcViewModel = new ChatUcViewModel();
+            this.DataContext = chatUcViewModel;
         }
     }
 }

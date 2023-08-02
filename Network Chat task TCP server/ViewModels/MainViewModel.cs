@@ -11,6 +11,7 @@ using System.Windows;
 using System.Collections.ObjectModel;
 using Network_Chat_task_TCP_server.Models;
 using Newtonsoft.Json;
+using Network_Chat_task_TCP_server.Views;
 
 namespace Network_Chat_task_TCP_server.ViewModels
 {
@@ -19,6 +20,7 @@ namespace Network_Chat_task_TCP_server.ViewModels
     {
         public RelayCommand ConnectServerCommand { get; set; }
         public RelayCommand SelectedUserChangedCommand { get; set; }
+        public RelayCommand SendMessageCommand { get; set; }
 
         static TcpListener _listener = null;
         static BinaryWriter bw = null;
@@ -32,19 +34,137 @@ namespace Network_Chat_task_TCP_server.ViewModels
             set { allUsers = value; OnPropertyChanged(); }
         }
 
+        private string serverName;
+
+        public string ServerName
+        {
+            get { return serverName; }
+            set { serverName = value; OnPropertyChanged(); }
+        }
+
+        private User selectedUser;
+
+        public User SelectedUser
+        {
+            get { return selectedUser; }
+            set { selectedUser = value; OnPropertyChanged(); }
+        }
+
+        static List<User> users = new List<User>();
+
+
         public MainViewModel()
         {
-            var ipAdressRemote = IPAddress.Parse("192.168.0.109");
+            var ipAdressRemote = IPAddress.Parse("10.1.18.3");
             var port = 27001;
 
             SelectedUserChangedCommand = new RelayCommand((_) =>
             {
-                MessageBox.Show("s");
+                var a = SelectedUser.EndPoint.Split(':');
+                var ipAdressRemote1 = IPAddress.Parse(a[0]);
+                var port1 = 27002;
+
+                var endPoint = new IPEndPoint(ipAdressRemote1, port1);
+
+                _listener = new TcpListener(endPoint);
+
+                _listener.Start();
+
+                //var client1 = new TcpClient();
+
+                App.MessageWrapPanel.Children.Clear();
+                ChatUC chatUC = new ChatUC();
+                ChatUcViewModel chatUcViewModel = new ChatUcViewModel();
+                chatUcViewModel.UserName = SelectedUser.Name;
+                chatUC.DataContext = chatUcViewModel;
+                App.MessageWrapPanel.Children.Add(chatUC);
+
+                chatUcViewModel.SendCommand = new RelayCommand((__) =>
+                {
+                    //MessageBox.Show(chatUcViewModel.UserMessage);
+
+                    Task.Run(() =>
+                    {
+                        while (true)
+                        {
+                            var client = endPoint;
+                            for (int i = 0; i < users.Count; i++)
+                            {
+                                if (users[i].Name == SelectedUser.Name)
+                                {
+                                    Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+                                    socket.Connect(endPoint);
+                                    var buffer = new byte[2048];
+                                    if (socket.Connected)
+                                    {
+                                        socket.Receive(buffer);
+                                    }
+                                    MessageBox.Show($"salam --=-----= {users[i].Name}");
+                                }
+                            }
+                            //var client=_listener.
+                            Task.Run(() =>
+                            {
+                                //App.Current.Dispatcher.Invoke((System.Action)delegate
+                                //{
+                                //var reader = Task.Run(() =>
+                                //{
+                                //    var stream = client.GetStream();
+                                //    br = new BinaryReader(stream);
+                                //    while (true)
+                                //    {
+
+                                //        var msg = br.ReadString();
+
+                                //        var user = JsonConvert.DeserializeObject<User>(msg);
+
+                                //        //App.Current.Dispatcher.Invoke((System.Action)delegate
+                                //        //{
+                                //        //    AllUsers.Add(user);
+                                //        //    //MessageBox.Show($"{user.Name} adli kisi sayfaya eklendi");
+                                //        //    //MessageBox.Show($"{AllUsers.Count}");
+                                //        //    //MessageBox.Show($"{client.Client.LocalEndPoint}");
+                                //        //});
+                                //        //try
+                                //        //{
+                                //        //    AllUsers.Add(user);
+                                //        //}
+                                //        //catch (Exception)
+                                //        //{
+
+                                //        //}
+                                //    }
+                                //});
+
+                                //}
+                                //});
+
+                                //SendMessageCommand = new RelayCommand((__) =>
+                                //{
+                                //var writer = Task.Run(() =>
+                                //{
+                                //    var stream = client.GetStream();
+                                //    bw = new BinaryWriter(stream);
+
+                                //    while (true)
+                                //    {
+                                //        if (serverName != String.Empty)
+                                //        {
+                                //            bw.Write(chatUcViewModel.UserMessage);
+                                //            //MessageBox.Show($"Send message : {serverName}");
+                                //            serverName = String.Empty;
+                                //        }
+                                //    }
+                                //});
+                                //});
+                            });
+                        }
+                    });
+                });
             });
 
             ConnectServerCommand = new RelayCommand((_) =>
             {
-
                 var endPoint = new IPEndPoint(ipAdressRemote, port);
 
                 _listener = new TcpListener(endPoint);
@@ -52,53 +172,68 @@ namespace Network_Chat_task_TCP_server.ViewModels
                 _listener.Start();
                 MessageBox.Show($"Server Start");
 
-                while (true)
+                Task.Run(() =>
                 {
-                    var client = _listener.AcceptTcpClient();
-                    MessageBox.Show($"{client.Client.LocalEndPoint}");
-
-                    Task.Run(() =>
+                    while (true)
                     {
-                        //App.Current.Dispatcher.Invoke((System.Action)delegate
-                        //{
-                        var reader = Task.Run(() =>
+                        var client = _listener.AcceptTcpClient();
+                        Task.Run(() =>
                         {
-                            var stream = client.GetStream();
-                            br = new BinaryReader(stream);
-                            while (true)
+                            //App.Current.Dispatcher.Invoke((System.Action)delegate
+                            //{
+                            var reader = Task.Run(() =>
                             {
-                                var msg = br.ReadString();
+                                var stream = client.GetStream();
+                                br = new BinaryReader(stream);
+                                while (true)
+                                {
+                                    var msg = br.ReadString();
 
-                                var user = JsonConvert.DeserializeObject<User>(msg);
+                                    var user = JsonConvert.DeserializeObject<User>(msg);
 
-                                MessageBox.Show($"{user.Name} adli kisi sayfaya eklendi");
-                                //try
-                                //{
-                                //    AllUsers.Add(user);
-                                //}
-                                //catch (Exception)
-                                //{
-                                //    MessageBox.Show($"{AllUsers.Count}");
+                                    App.Current.Dispatcher.Invoke((System.Action)delegate
+                                    {
+                                        AllUsers.Add(user);
+                                        users.Add(user);
+                                        //MessageBox.Show($"{user.Name} adli kisi sayfaya eklendi");
+                                        //MessageBox.Show($"{AllUsers.Count}");
+                                        //MessageBox.Show($"{client.Client.LocalEndPoint}");
+                                    });
+                                    //try
+                                    //{
+                                    //    AllUsers.Add(user);
+                                    //}
+                                    //catch (Exception)
+                                    //{
 
-                                //}
-                            }
-                        });
+                                    //}
+                                }
+                            });
 
-                        //}
-                        //});
+                            //}
+                            //});
 
-                        var writer = Task.Run(() =>
-                        {
-                            var stream = client.GetStream();
-                            bw = new BinaryWriter(stream);
-
-                            while (true)
+                            //SendMessageCommand = new RelayCommand((__) =>
+                            //{
+                            var writer = Task.Run(() =>
                             {
-                                bw.Write("salam");
-                            }
+                                var stream = client.GetStream();
+                                bw = new BinaryWriter(stream);
+
+                                while (true)
+                                {
+                                    if (serverName != String.Empty)
+                                    {
+                                        bw.Write(serverName);
+                                        //MessageBox.Show($"Send message : {serverName}");
+                                        serverName = String.Empty;
+                                    }
+                                }
+                            });
+                            //});
                         });
-                    });
-                }
+                    }
+                });
             });
         }
     }
