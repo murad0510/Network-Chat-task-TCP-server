@@ -22,7 +22,11 @@
 
             <Label Content="{Binding UserName}" Margin="110,10,0,0"></Label>
 
-            <StackPanel Width="540" Height="300" Margin="0,50,0,0"></StackPanel>
+            <ScrollViewer Grid.Row="1">
+                <WrapPanel Name="UserMessageWrapOanel" Orientation="Vertical" Width="540" Background="#F7F2E0" Height="300" Margin="0,50,0,0">
+                    
+                </WrapPanel>
+            </ScrollViewer>
 
             <Ellipse Canvas.Bottom="16" Canvas.Left="63" Height="40" Width="40" Canvas.Top="5">
                 <Ellipse.Fill>

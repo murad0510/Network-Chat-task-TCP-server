@@ -12,6 +12,8 @@ using System.Collections.ObjectModel;
 using Network_Chat_task_TCP_server.Models;
 using Newtonsoft.Json;
 using Network_Chat_task_TCP_server.Views;
+using Network_Chat_task_TCP_server.Views.UserControls;
+using System.Windows.Interop;
 
 namespace Network_Chat_task_TCP_server.ViewModels
 {
@@ -50,25 +52,34 @@ namespace Network_Chat_task_TCP_server.ViewModels
             set { selectedUser = value; OnPropertyChanged(); }
         }
 
-        static List<User> users = new List<User>();
+        private bool serverUpButtonIsEnabled = true;
+
+        public bool ServerUpButtonIsEnabled
+        {
+            get { return serverUpButtonIsEnabled; }
+            set { serverUpButtonIsEnabled = value; OnPropertyChanged(); }
+        }
+
+
+        static List<TcpClient> users = new List<TcpClient>();
 
 
         public MainViewModel()
         {
-            var ipAdressRemote = IPAddress.Parse("10.1.18.3");
+            var ipAdressRemote = IPAddress.Parse("192.168.0.109");
             var port = 27001;
 
             SelectedUserChangedCommand = new RelayCommand((_) =>
             {
-                var a = SelectedUser.EndPoint.Split(':');
-                var ipAdressRemote1 = IPAddress.Parse(a[0]);
-                var port1 = 27002;
+                //var a = SelectedUser.EndPoint.Split(':');
+                //var ipAdressRemote1 = IPAddress.Parse(a[0]);
+                //var port1 = 27002;
 
-                var endPoint = new IPEndPoint(ipAdressRemote1, port1);
+                //var endPoint = new IPEndPoint(ipAdressRemote1, port1);
 
-                _listener = new TcpListener(endPoint);
+                //_listener = new TcpListener(endPoint);
 
-                _listener.Start();
+                //_listener.Start();
 
                 //var client1 = new TcpClient();
 
@@ -85,87 +96,121 @@ namespace Network_Chat_task_TCP_server.ViewModels
 
                     Task.Run(() =>
                     {
-                        while (true)
+                        //while (true)
+                        //{
+                        for (int i = 0; i < users.Count; i++)
                         {
-                            var client = endPoint;
-                            for (int i = 0; i < users.Count; i++)
+                            if (users[i].Client.LocalEndPoint.ToString() == SelectedUser.EndPoint)
                             {
-                                if (users[i].Name == SelectedUser.Name)
+                                //MessageBox.Show($"salam --={SelectedUser.Name}");
+                                var client = users[i];
+                                var writer = Task.Run(() =>
                                 {
-                                    Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-                                    socket.Connect(endPoint);
-                                    var buffer = new byte[2048];
-                                    if (socket.Connected)
+                                    var stream = client.GetStream();
+                                    bw = new BinaryWriter(stream);
+
+                                    while (true)
                                     {
-                                        socket.Receive(buffer);
+                                        if (chatUcViewModel.UserMessage != String.Empty)
+                                        {
+                                            bw.Write(chatUcViewModel.UserMessage);
+                                            //MessageBox.Show($"Send message : {serverName}");
+                                            App.Current.Dispatcher.Invoke((System.Action)delegate
+                                            {
+                                                EachMessageUcViewModel eachMessageUcViewModel = new EachMessageUcViewModel();
+                                                EachMessageUC eachMessageUC = new EachMessageUC();
+                                                eachMessageUcViewModel.Message = chatUcViewModel.UserMessage;
+                                                eachMessageUC.DataContext = eachMessageUcViewModel;
+                                                //MessageBox.Show($"{eachMessageUcViewModel.Msg}");
+                                                App.UserMessageWrapPanel.Children.Add(eachMessageUC);
+                                                //MessageBox.Show($"{App.UserMessageStackPanel.Children.Count}");
+                                            });
+                                            chatUcViewModel.UserMessage = String.Empty;
+
+                                        }
                                     }
-                                    MessageBox.Show($"salam --=-----= {users[i].Name}");
-                                }
+                                });
                             }
-                            //var client=_listener.
-                            Task.Run(() =>
-                            {
-                                //App.Current.Dispatcher.Invoke((System.Action)delegate
-                                //{
-                                //var reader = Task.Run(() =>
-                                //{
-                                //    var stream = client.GetStream();
-                                //    br = new BinaryReader(stream);
-                                //    while (true)
-                                //    {
+                            //}
+                            ////var client=_listener.
+                            //Task.Run(() =>
+                            //{
+                            //    //App.Current.Dispatcher.Invoke((System.Action)delegate
+                            //    //{
+                            //    //var reader = Task.Run(() =>
+                            //    //{
+                            //    //    var stream = client.GetStream();
+                            //    //    br = new BinaryReader(stream);
+                            //    //    while (true)
+                            //    //    {
 
-                                //        var msg = br.ReadString();
+                            //    //        var msg = br.ReadString();
 
-                                //        var user = JsonConvert.DeserializeObject<User>(msg);
+                            //    //        var user = JsonConvert.DeserializeObject<User>(msg);
 
-                                //        //App.Current.Dispatcher.Invoke((System.Action)delegate
-                                //        //{
-                                //        //    AllUsers.Add(user);
-                                //        //    //MessageBox.Show($"{user.Name} adli kisi sayfaya eklendi");
-                                //        //    //MessageBox.Show($"{AllUsers.Count}");
-                                //        //    //MessageBox.Show($"{client.Client.LocalEndPoint}");
-                                //        //});
-                                //        //try
-                                //        //{
-                                //        //    AllUsers.Add(user);
-                                //        //}
-                                //        //catch (Exception)
-                                //        //{
+                            //    //        //App.Current.Dispatcher.Invoke((System.Action)delegate
+                            //    //        //{
+                            //    //        //    AllUsers.Add(user);
+                            //    //        //    //MessageBox.Show($"{user.Name} adli kisi sayfaya eklendi");
+                            //    //        //    //MessageBox.Show($"{AllUsers.Count}");
+                            //    //        //    //MessageBox.Show($"{client.Client.LocalEndPoint}");
+                            //    //        //});
+                            //    //        //try
+                            //    //        //{
+                            //    //        //    AllUsers.Add(user);
+                            //    //        //}
+                            //    //        //catch (Exception)
+                            //    //        //{
 
-                                //        //}
-                                //    }
-                                //});
+                            //    //        //}
+                            //    //    }
+                            //    //});
 
-                                //}
-                                //});
+                            //    //}
+                            //    //});
 
-                                //SendMessageCommand = new RelayCommand((__) =>
-                                //{
-                                //var writer = Task.Run(() =>
-                                //{
-                                //    var stream = client.GetStream();
-                                //    bw = new BinaryWriter(stream);
+                            //    //SendMessageCommand = new RelayCommand((__) =>
+                            //    //{
+                            //    //var writer = Task.Run(() =>
+                            //    //{
+                            //    //    var stream = client.GetStream();
+                            //    //    bw = new BinaryWriter(stream);
 
-                                //    while (true)
-                                //    {
-                                //        if (serverName != String.Empty)
-                                //        {
-                                //            bw.Write(chatUcViewModel.UserMessage);
-                                //            //MessageBox.Show($"Send message : {serverName}");
-                                //            serverName = String.Empty;
-                                //        }
-                                //    }
-                                //});
-                                //});
-                            });
+                            //    //    while (true)
+                            //    //    {
+                            //    //        if (serverName != String.Empty)
+                            //    //        {
+                            //    //            bw.Write(chatUcViewModel.UserMessage);
+                            //    //            //MessageBox.Show($"Send message : {serverName}");
+                            //    //            serverName = String.Empty;
+                            //    //        }
+                            //    //    }
+                            //    //});
+                            //    //});
+                            //});
                         }
                     });
                 });
             });
 
+            Task.Run(() =>
+            {
+                while (true)
+                {
+                    for (int i = 0; i < users.Count; i++)
+                    {
+                        if (!users[i].Connected)
+                        {
+                            users.Remove(users[i]);
+                        }
+                    }
+                }
+            });
+
             ConnectServerCommand = new RelayCommand((_) =>
             {
                 var endPoint = new IPEndPoint(ipAdressRemote, port);
+                ServerUpButtonIsEnabled = false;
 
                 _listener = new TcpListener(endPoint);
 
@@ -194,7 +239,7 @@ namespace Network_Chat_task_TCP_server.ViewModels
                                     App.Current.Dispatcher.Invoke((System.Action)delegate
                                     {
                                         AllUsers.Add(user);
-                                        users.Add(user);
+                                        users.Add(client);
                                         //MessageBox.Show($"{user.Name} adli kisi sayfaya eklendi");
                                         //MessageBox.Show($"{AllUsers.Count}");
                                         //MessageBox.Show($"{client.Client.LocalEndPoint}");
@@ -230,6 +275,7 @@ namespace Network_Chat_task_TCP_server.ViewModels
                                     }
                                 }
                             });
+
                             //});
                         });
                     }

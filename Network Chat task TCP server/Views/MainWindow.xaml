@@ -5,10 +5,10 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Network_Chat_task_TCP_server" xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
         mc:Ignorable="d"
-        Title="MainWindow" Height="540" Width="820">
+        Title="MainWindow" Height="540" Width="820" ResizeMode="NoResize">
     <Grid>
         <Canvas>
-            <Button Command="{Binding ConnectServerCommand}" Width="200" Height="30" Content="Server up" FontSize="20" Background="DeepSkyBlue" Foreground="White" Margin="600,17,0,0">
+            <Button IsEnabled="{Binding ServerUpButtonIsEnabled}" Command="{Binding ConnectServerCommand}" Width="200" Height="30" Content="Server up" FontSize="20" Background="DeepSkyBlue" Foreground="White" Margin="600,17,0,0">
                 <Button.Resources>
                     <Style TargetType="Border">
                         <Setter Property="CornerRadius" Value="10"/>

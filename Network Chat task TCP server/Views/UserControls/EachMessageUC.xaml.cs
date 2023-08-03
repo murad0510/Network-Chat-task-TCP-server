@@ -14,19 +14,18 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace Network_Chat_task_TCP_server.Views
+namespace Network_Chat_task_TCP_server.Views.UserControls
 {
     /// <summary>
-    /// Interaction logic for ChatUC.xaml
+    /// Interaction logic for EachMessageUC.xaml
     /// </summary>
-    public partial class ChatUC : UserControl
+    public partial class EachMessageUC : UserControl
     {
-        public ChatUC()
+        public EachMessageUC()
         {
             InitializeComponent();
-            App.UserMessageWrapPanel = UserMessageWrapOanel;
-            ChatUcViewModel chatUcViewModel = new ChatUcViewModel();
-            this.DataContext = chatUcViewModel;
+            EachMessageUcViewModel eachMessageUcView = new EachMessageUcViewModel();
+            this.DataContext = eachMessageUcView;
         }
     }
 }
