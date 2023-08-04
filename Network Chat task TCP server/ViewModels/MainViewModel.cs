@@ -100,36 +100,34 @@ namespace Network_Chat_task_TCP_server.ViewModels
                         //{
                         for (int i = 0; i < users.Count; i++)
                         {
-                            if (users[i].Client.LocalEndPoint.ToString() == SelectedUser.EndPoint)
+                            if (SelectedUser.EndPoint == users[i].Client.RemoteEndPoint.ToString())
                             {
-                                //MessageBox.Show($"salam --={SelectedUser.Name}");
                                 var client = users[i];
-                                var writer = Task.Run(() =>
+                                //var writer = Task.Run(() =>
+                                //{
+                                var stream = client.GetStream();
+                                bw = new BinaryWriter(stream);
+
+                                //while (true)
+                                //{
+                                if (chatUcViewModel.UserMessage != String.Empty)
                                 {
-                                    var stream = client.GetStream();
-                                    bw = new BinaryWriter(stream);
-
-                                    //while (true)
-                                    //{
-                                    if (chatUcViewModel.UserMessage != String.Empty)
+                                    bw.Write(chatUcViewModel.UserMessage);
+                                    //MessageBox.Show($"Send message : {serverName}");
+                                    App.Current.Dispatcher.Invoke((System.Action)delegate
                                     {
-                                        bw.Write(chatUcViewModel.UserMessage);
-                                        //MessageBox.Show($"Send message : {serverName}");
-                                        App.Current.Dispatcher.Invoke((System.Action)delegate
-                                        {
-                                            EachMessageUcViewModel eachMessageUcViewModel = new EachMessageUcViewModel();
-                                            EachMessageUC eachMessageUC = new EachMessageUC();
-                                            eachMessageUcViewModel.Message = chatUcViewModel.UserMessage;
-                                            eachMessageUC.DataContext = eachMessageUcViewModel;
-                                            //MessageBox.Show($"{eachMessageUcViewModel.Msg}");
-                                            App.UserMessageWrapPanel.Children.Add(eachMessageUC);
-                                            //MessageBox.Show($"{App.UserMessageStackPanel.Children.Count}");
-                                        });
-                                        chatUcViewModel.UserMessage = String.Empty;
-
-                                    }
-                                    //}
-                                });
+                                        EachMessageUcViewModel eachMessageUcViewModel = new EachMessageUcViewModel();
+                                        EachMessageUC eachMessageUC = new EachMessageUC();
+                                        eachMessageUcViewModel.Message = chatUcViewModel.UserMessage;
+                                        eachMessageUC.DataContext = eachMessageUcViewModel;
+                                        //MessageBox.Show($"{eachMessageUcViewModel.Msg}");
+                                        App.UserMessageWrapPanel.Children.Add(eachMessageUC);
+                                        //MessageBox.Show($"{App.UserMessageStackPanel.Children.Count}");
+                                    });
+                                    chatUcViewModel.UserMessage = String.Empty;
+                                }
+                                //}
+                                //});
                             }
                             //}
                             ////var client=_listener.
